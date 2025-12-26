@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, User, BurnParameters, SimulationResult, Aspect, FuelType } from './types';
 import Home from './components/Home';
@@ -314,7 +313,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Mobile Header */}
-        <div className="md:hidden bg-white border-b p-4 flex justify-between items-center shadow-sm z-10">
+        <div className="md:hidden bg-white border-b p-4 flex justify-between items-center shadow-sm z-10 sticky top-0">
           <div className="flex items-center gap-3">
             <CfvaLogo className="w-8 h-8" />
             <h1 className="font-bold text-slate-800 text-sm leading-tight">
@@ -326,7 +325,7 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-auto p-4 md:p-8 bg-slate-100/50">
+        <div className="flex-1 overflow-auto p-4 md:p-8 bg-slate-100/50 pb-24 md:pb-8">
           <div className="max-w-7xl mx-auto h-full flex flex-col">
             {currentView !== View.HOME && (
               <header className="mb-8 hidden md:block flex-shrink-0 animate-in slide-in-from-top-4">
@@ -364,6 +363,48 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <div className="md:hidden fixed bottom-6 left-6 right-6 bg-slate-900/95 backdrop-blur-xl text-white py-4 px-6 rounded-2xl flex justify-between items-center shadow-2xl z-50 border border-white/10">
+        <button
+          onClick={() => setCurrentView(View.HOME)}
+          className={`flex flex-col items-center gap-1 transition ${currentView === View.HOME ? 'text-orange-500 scale-110' : 'text-slate-400 opacity-60'}`}
+        >
+          <LayoutDashboard className="w-6 h-6" />
+        </button>
+
+        <button
+          onClick={() => setCurrentView(View.PLANNER)}
+          className={`flex flex-col items-center gap-1 transition ${currentView === View.PLANNER ? 'text-orange-500 scale-110' : 'text-slate-400 opacity-60'}`}
+        >
+          <Flame className="w-6 h-6" />
+        </button>
+
+        {/* CENTER ACTION BUTTON */}
+        <div className="bg-orange-600 rounded-full p-3 -mt-10 shadow-lg shadow-orange-500/40 border-4 border-slate-100 flex items-center justify-center">
+          <button
+            onClick={() => setCurrentView(View.MAP)}
+            className={`transition ${currentView === View.MAP ? 'text-white' : 'text-white/90'}`}
+          >
+            <MapIcon className="w-6 h-6" />
+          </button>
+        </div>
+
+        <button
+          onClick={() => setCurrentView(View.REPORT)}
+          disabled={!lastResult}
+          className={`flex flex-col items-center gap-1 transition ${currentView === View.REPORT ? 'text-orange-500 scale-110' : !lastResult ? 'text-slate-600 cursor-not-allowed hidden' : 'text-slate-400 opacity-60'}`}
+        >
+          <FileText className="w-6 h-6" />
+        </button>
+
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          className="flex flex-col items-center gap-1 text-slate-400 opacity-60"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
     </div>
   );
 };
