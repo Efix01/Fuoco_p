@@ -1,7 +1,13 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const key = "AIzaSyCuyGK60f66yxm1z4S5cpCV8jDcYrz50Ys";
+const key = process.env.VITE_GOOGLE_API_KEY || process.env.GOOGLE_API_KEY;
+
+if (!key) {
+    console.error("Error: API_KEY is missing. Please set VITE_GOOGLE_API_KEY in your .env file.");
+    process.exit(1);
+}
+
 const client = new GoogleGenAI({ apiKey: key });
 
 async function testGenerate() {

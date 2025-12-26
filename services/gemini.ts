@@ -231,7 +231,7 @@ export const generateTrainingVideo = async (prompt: string): Promise<string> => 
   const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
   if (!downloadLink) throw new Error("Video non disponibile.");
 
-  const response = await fetch(`${downloadLink} & key=${process.env.API_KEY}`);
+  const response = await fetch(`${downloadLink}&key=${(import.meta.env && import.meta.env.VITE_GOOGLE_API_KEY) || (process.env as any).VITE_GOOGLE_API_KEY}`);
   const blob = await response.blob();
   return URL.createObjectURL(blob);
 };
