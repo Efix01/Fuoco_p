@@ -1,0 +1,7 @@
+{
+  "name": "CFVA - Fuoco Prescritto",
+  "description": "Suite operativa per il Gruppo Analisi e Utilizzo del Fuoco (Sardegna). Pianificazione, Sicurezza e Training.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
