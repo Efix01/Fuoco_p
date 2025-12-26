@@ -203,14 +203,14 @@ const Planner: React.FC<PlannerProps> = ({ onResultGenerated, initialParams, ini
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <div className="bg-white/5 backdrop-blur-md p-5 md:p-6 rounded-3xl border border-white/10">
                   <p className="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Avanzamento (ROS)</p>
-                  <p className="text-4xl font-black text-white">{result.ros}</p>
+                  <p className="text-3xl md:text-4xl font-black text-white">{result.ros}</p>
                 </div>
-                <div className="bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10">
+                <div className="bg-white/5 backdrop-blur-md p-5 md:p-6 rounded-3xl border border-white/10">
                   <p className="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Lungh. Fiamma</p>
-                  <p className="text-4xl font-black text-white">{result.flameLength}</p>
+                  <p className="text-3xl md:text-4xl font-black text-white">{result.flameLength}</p>
                 </div>
               </div>
             </div>
