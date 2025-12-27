@@ -240,7 +240,10 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
             <Medal className="w-5 h-5 text-slate-500" />
             Registro Personale
           </h3>
-          <span className="text-xs text-slate-400 font-mono">DB: {supabase['auth'] && !supabase['auth']['signInWithPassword'] ? 'MOCK' : 'SUPABASE'}</span>
+          <span className={`text-xs font-mono font-bold px-2 py-1 rounded ${(supabase as any).supabaseUrl ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'
+            }`}>
+            DB: {(supabase as any).supabaseUrl ? 'ONLINE (SUPABASE)' : 'OFFLINE (MOCK)'}
+          </span>
         </div>
 
         {loading ? (
