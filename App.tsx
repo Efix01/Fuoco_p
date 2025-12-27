@@ -325,8 +325,9 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-auto p-4 md:p-8 bg-slate-100/50 pb-24 md:pb-8">
-          <div className="max-w-7xl mx-auto h-full flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-100/50 relative">
+          <div className={`flex-1 flex flex-col max-w-7xl mx-auto w-full h-full ${currentView === View.MAP ? 'p-0 overflow-hidden' : 'p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto'
+            }`}>
             {currentView !== View.HOME && (
               <header className="mb-8 hidden md:block flex-shrink-0 animate-in slide-in-from-top-4">
                 <div className="flex items-center gap-2 mb-1">

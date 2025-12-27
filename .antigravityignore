@@ -1,0 +1,32 @@
+# Dipendenze (MOLTO IMPORTANTE: contengono migliaia di file)
+node_modules/
+bower_components/
+
+# Cartelle di Build e Output
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Log e file temporanei
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.logs/
+tmp/
+
+# Cartelle di sistema e versionamento
+.git/
+.svn/
+.hg/
+.DS_Store
+
+# Cartelle pesanti di Antigravity (Log dei test e screenshot)
+.antigravity/logs/
+.antigravity/artifacts/
+.antigravity/recordings/
+
+# File di ambiente (per sicurezza e risparmio quota)
+.env
+.env.local
