@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Operator, User } from '../types';
-import { supabase } from '../services/supabase';
-import { Users, Clock, Plus, Medal, TrendingUp, Save, UserPlus, Trash2, Loader2, AlertCircle } from 'lucide-react';
+import { supabase, isOnlineMode } from '../services/supabase';
+import { Users, Clock, Plus, Medal, TrendingUp, Save, UserPlus, Trash2, Loader2, AlertCircle, Lock } from 'lucide-react';
 
 interface OperatorLogProps {
   user?: User;
@@ -240,9 +240,8 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
             <Medal className="w-5 h-5 text-slate-500" />
             Registro Personale
           </h3>
-          <span className={`text-xs font-mono font-bold px-2 py-1 rounded ${(supabase as any).supabaseUrl ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'
-            }`}>
-            DB: {(supabase as any).supabaseUrl ? 'ONLINE (SUPABASE)' : 'OFFLINE (MOCK)'}
+          <span className={`text-xs font-mono font-bold px-2 py-1 rounded ${isOnlineMode ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>
+            DB: {isOnlineMode ? 'ONLINE (SUPABASE)' : 'OFFLINE (MOCK)'}
           </span>
         </div>
 

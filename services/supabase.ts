@@ -247,3 +247,6 @@ const client = (supabaseUrl && supabaseUrl.trim() !== '' && supabaseAnonKey && s
   : (createMockSupabase() as any);
 
 export const supabase = client;
+export const isSupabaseOnline = (supabaseUrl !== FAILSAFE_URL) || (supabaseUrl === FAILSAFE_URL); // Always online now due to failsafe, but logic preserved for clarity
+// Actually, let's simplify: isOnline is true if we used createClient
+export const isOnlineMode = (supabaseUrl && supabaseUrl.trim() !== '' && supabaseAnonKey && supabaseAnonKey.trim() !== '');
