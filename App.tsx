@@ -261,8 +261,15 @@ const App: React.FC = () => {
             <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
             <p className="text-[10px] text-slate-400 truncate uppercase tracking-tight">{currentUser.rank}</p>
           </div>
-          <button onClick={handleLogout} className="text-slate-500 hover:text-red-500 transition" title="Esci">
-            <LogOut className="w-4 h-4" />
+        </div>
+
+        <div className="px-4 py-2">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-red-900/50 text-slate-300 hover:text-red-200 py-2 rounded-lg transition border border-slate-700 hover:border-red-800 group"
+          >
+            <LogOut className="w-4 h-4 group-hover:scale-110 transition" />
+            <span className="text-xs font-bold uppercase tracking-wider">Disconnetti</span>
           </button>
         </div>
 
@@ -340,7 +347,7 @@ const App: React.FC = () => {
             )}
 
             <div className="flex-1 min-h-0">
-              {currentView === View.HOME && <Home onNavigate={setCurrentView} />}
+              {currentView === View.HOME && <Home onNavigate={setCurrentView} onLogout={handleLogout} />}
               {currentView === View.PLANNER && (
                 <Planner
                   onResultGenerated={(p, r) => handleAnalysisComplete(p, r)}
