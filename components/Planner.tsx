@@ -188,51 +188,50 @@ const Planner: React.FC<PlannerProps> = ({ onResultGenerated, initialParams, ini
           <div className="animate-in slide-in-from-right-12 duration-700 space-y-6">
 
             {/* PANEL: METRICHE */}
-            <div className="bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl border border-white/5 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Activity className="w-48 h-48 text-white" />
+            <div className="bg-slate-900 rounded-[2rem] p-6 md:p-8 shadow-2xl border border-white/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+                <Activity className="w-32 h-32 md:w-48 md:h-48 text-white" />
               </div>
 
-              <div className="flex justify-between items-start mb-8">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
                 <div>
-                  <h3 className="text-orange-500 font-black text-xs uppercase tracking-[0.3em] mb-1">Dati Previsti (Antigravity AI)</h3>
-                  <h2 className="text-white text-3xl font-black tracking-tighter uppercase">Comportamento Incendio</h2>
+                  <h3 className="text-orange-500 font-black text-[10px] md:text-xs uppercase tracking-[0.3em] mb-1">Dati Previsti</h3>
+                  <h2 className="text-white text-2xl md:text-3xl font-black tracking-tighter uppercase leading-tight">Comportamento<br className="md:hidden" /> Incendio</h2>
                 </div>
-                <div className="bg-red-500/20 text-red-400 px-4 py-2 rounded-full text-[10px] font-black border border-red-500/30 flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4" /> RISCHIO: {result.riskAssessment.toUpperCase()}
+                <div className="bg-red-500/20 text-red-400 px-3 py-2 md:px-4 md:py-2 rounded-xl border border-red-500/30 flex items-center gap-2 self-start md:self-auto backdrop-blur-md">
+                  <ShieldAlert className="w-4 h-4 shrink-0" />
+                  <span className="text-[10px] font-black tracking-wider">RISCHIO: {result.riskAssessment.toUpperCase()}</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="bg-white/5 backdrop-blur-md p-5 md:p-6 rounded-3xl border border-white/10">
-                  <p className="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Avanzamento (ROS)</p>
-                  <p className="text-3xl md:text-4xl font-black text-white">{result.ros}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white/5 backdrop-blur-md p-5 rounded-2xl border border-white/10">
+                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Avanzamento (ROS)</p>
+                  <p className="text-3xl font-black text-white">{result.ros}</p>
                 </div>
-                <div className="bg-white/5 backdrop-blur-md p-5 md:p-6 rounded-3xl border border-white/10">
-                  <p className="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Lungh. Fiamma</p>
-                  <p className="text-3xl md:text-4xl font-black text-white">{result.flameLength}</p>
+                <div className="bg-white/5 backdrop-blur-md p-5 rounded-2xl border border-white/10">
+                  <p className="text-[10px] font-black text-slate-400 uppercase mb-1 tracking-widest">Lungh. Fiamma</p>
+                  <p className="text-3xl font-black text-white">{result.flameLength}</p>
                 </div>
               </div>
             </div>
 
             {/* PANEL: TACTICAL ADVICE */}
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 space-y-8">
-              <div className="flex gap-8">
-                <div className="flex-1 space-y-4">
-                  <h3 className="text-orange-600 font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4" /> Strategia Suggerita
-                  </h3>
-                  <p className="text-slate-800 text-lg font-medium leading-relaxed italic">
-                    "{result.tacticalAdvice}"
-                  </p>
-                </div>
+            <div className="bg-white rounded-[2rem] p-6 md:p-8 shadow-xl border border-slate-100 space-y-6 md:space-y-8">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-orange-600 font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 shrink-0" /> Strategia Suggerita
+                </h3>
+                <p className="text-slate-800 text-base md:text-lg font-medium leading-relaxed italic break-words">
+                  "{result.tacticalAdvice}"
+                </p>
               </div>
 
-              <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-3xl">
-                <h3 className="text-emerald-700 font-black text-[10px] uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4" /> Training Pill GAUF
+              <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl">
+                <h3 className="text-emerald-700 font-black text-[10px] uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4 shrink-0" /> Training Pill GAUF
                 </h3>
-                <p className="text-emerald-900 text-sm leading-relaxed font-semibold">
+                <p className="text-emerald-900 text-sm leading-relaxed font-semibold break-words">
                   {result.trainingTip}
                 </p>
               </div>
@@ -241,13 +240,13 @@ const Planner: React.FC<PlannerProps> = ({ onResultGenerated, initialParams, ini
               {result.reasoningPath && (
                 <div className="pt-6 border-t border-slate-100">
                   <h3 className="text-blue-600 font-black text-[10px] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                    <BrainCircuit className="w-4 h-4" /> Percorso Logico Antigravity (Campbell System)
+                    <BrainCircuit className="w-4 h-4 shrink-0" /> Percorso Logico (CPS)
                   </h3>
-                  <div className="bg-slate-50 p-6 rounded-3xl space-y-3">
+                  <div className="bg-slate-50 p-4 rounded-2xl space-y-3">
                     {result.reasoningPath.split('. ').map((step, i) => (
                       <div key={i} className="flex gap-3 items-start group">
-                        <span className="text-blue-500 font-black text-sm group-hover:scale-125 transition-transform">0{i + 1}.</span>
-                        <p className="text-slate-600 text-[11px] font-mono leading-relaxed">{step}.</p>
+                        <span className="text-blue-500 font-black text-xs shrink-0 mt-0.5">0{i + 1}.</span>
+                        <p className="text-slate-600 text-[11px] font-mono leading-relaxed break-words">{step}.</p>
                       </div>
                     ))}
                   </div>
