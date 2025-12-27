@@ -359,7 +359,7 @@ const App: React.FC = () => {
               {currentView === View.CHECKLIST && <Checklist />}
               {currentView === View.TRAINING && <TrainingChat />}
               {currentView === View.MAP && <MapEditor />}
-              {currentView === View.OPERATORS && <OperatorLog />}
+              {currentView === View.OPERATORS && <OperatorLog user={currentUser} />}
             </div>
           </div>
         </div>

@@ -1,10 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
-import { Operator } from '../types';
+import { Operator, User } from '../types';
 import { supabase } from '../services/supabase';
 import { Users, Clock, Plus, Medal, TrendingUp, Save, UserPlus, Trash2, Loader2, AlertCircle } from 'lucide-react';
 
-const OperatorLog: React.FC = () => {
+interface OperatorLogProps {
+  user?: User;
+}
+
+const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
   const [operators, setOperators] = useState<Operator[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,6 +16,14 @@ const OperatorLog: React.FC = () => {
   const [hoursToAdd, setHoursToAdd] = useState<number>(4);
   const [newOpName, setNewOpName] = useState('');
   const [creating, setCreating] = useState(false);
+
+  // ADMIN CHECK
+  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+  // Admin is true if: Email matches env var OR Rank is high level (DOS/Direttore) - Optional fallback
+  const isAdmin = user?.isAuthenticated && (
+    (adminEmail && user.email === adminEmail) ||
+    ['DOS', 'Direttore', 'Ispettore'].includes(user.rank || '')
+  );
 
   // Fetch Operators from Supabase
   const fetchOperators = async () => {
@@ -28,7 +39,7 @@ const OperatorLog: React.FC = () => {
       setOperators((data as any[]) || []);
     } catch (err: any) {
       console.error("Errore fetch operatori:", err);
-      setError("Impossibile caricare il registro operatori.");
+      setError("Impossibile caricare il registro operatori: " + (err.message || "Errore sconosciuto"));
     } finally {
       setLoading(false);
     }
@@ -64,6 +75,13 @@ const OperatorLog: React.FC = () => {
     if (!newOpName.trim()) return;
     setCreating(true);
 
+    // Safety check
+    if (!isAdmin) {
+      alert("Solo l'amministratore può aggiungere operatori.");
+      setCreating(false);
+      return;
+    }
+
     const newOp = {
       // id: generato da Supabase o UUID locale nel mock
       name: newOpName,
@@ -87,14 +105,20 @@ const OperatorLog: React.FC = () => {
         fetchOperators();
       }
       setNewOpName('');
-    } catch (err) {
-      alert("Errore creazione operatore.");
+    } catch (err: any) {
+      console.error("Detailed Insert Error:", err);
+      // SHOW DETAILED ERROR TO USER
+      alert(`Errore creazione operatore: ${err.message || JSON.stringify(err)}`);
     } finally {
       setCreating(false);
     }
   };
 
   const handleDelete = async (id: string) => {
+    if (!isAdmin) {
+      alert("Solo l'amministratore può eliminare operatori.");
+      return;
+    }
     if (!confirm('Sei sicuro di voler rimuovere questo operatore dal database?')) return;
 
     try {
@@ -106,8 +130,8 @@ const OperatorLog: React.FC = () => {
       if (error) throw error;
 
       setOperators(prev => prev.filter(op => op.id !== id));
-    } catch (err) {
-      alert("Errore eliminazione operatore.");
+    } catch (err: any) {
+      alert("Errore eliminazione operatore: " + err.message);
     }
   };
 
@@ -142,25 +166,32 @@ const OperatorLog: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-md border border-slate-100 flex flex-col justify-center">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              name="operator_entry_field"
-              autoComplete="off"
-              data-lpignore="true"
-              placeholder="Nuovo Operatore..."
-              value={newOpName}
-              onChange={(e) => setNewOpName(e.target.value)}
-              className="flex-1 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-            <button
-              onClick={handleCreateOperator}
-              disabled={!newOpName || creating}
-              className="bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition"
-            >
-              {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
-            </button>
-          </div>
+          {isAdmin ? (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="operator_entry_field"
+                autoComplete="off"
+                data-lpignore="true"
+                placeholder="Nuovo Operatore..."
+                value={newOpName}
+                onChange={(e) => setNewOpName(e.target.value)}
+                className="flex-1 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                onClick={handleCreateOperator}
+                disabled={!newOpName || creating}
+                className="bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition"
+              >
+                {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
+              </button>
+            </div>
+          ) : (
+            <div className="text-center text-slate-400 text-xs italic">
+              <Lock className="w-4 h-4 mx-auto mb-1 opacity-50" />
+              Solo Amministratori/DOS
+            </div>
+          )}
         </div>
       </div>
 
@@ -262,13 +293,15 @@ const OperatorLog: React.FC = () => {
                               <Plus className="w-4 h-4" />
                               <span>Ore</span>
                             </button>
-                            <button
-                              onClick={() => handleDelete(op.id)}
-                              className="p-2 text-slate-300 hover:text-red-500 transition"
-                              title="Elimina"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleDelete(op.id)}
+                                className="p-2 text-slate-300 hover:text-red-500 transition"
+                                title="Elimina"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
                           </>
                         )}
                       </div>
