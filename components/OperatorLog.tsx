@@ -78,12 +78,19 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
   };
 
   const handleCreateOperator = async () => {
-    if (!newOpName.trim()) return;
+    alert("Click ricevuto! Inizio procedura..."); // DEBUG ALERT
+    console.log("Attempting to create operator...", { newOpName, newOpRole, isAdmin, userRank });
+
+    if (!newOpName.trim()) {
+      alert("Il nome non può essere vuoto.");
+      return;
+    }
     setCreating(true);
 
     // Safety check
     if (!isAdmin) {
-      alert(`Solo l'amministratore può aggiungere operatori. Il tuo grado attuale è: ${user?.rank || 'Sconosciuto'}`);
+      console.warn("Admin check failed", { user });
+      alert(`ACCESSO NEGATO: Solo Amministratori/DOS possono aggiungere operatori.\n\nIl tuo grado rilevato è: '${user?.rank || 'Sconosciuto'}'\nEmail: ${user?.email || 'N/A'}`);
       setCreating(false);
       return;
     }
@@ -97,12 +104,19 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
     };
 
     try {
+      console.log("Sending insert to supabase:", newOp);
       const { data, error } = await supabase
         .from('operators')
         .insert([newOp])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase Insert Error:", error);
+        throw error;
+      }
+
+      console.log("Insert success:", data);
+      alert("Operatore creato con successo!"); // SUCCESS ALERT
 
       if (data) {
         setOperators(prev => [...prev, ...data]);
@@ -156,7 +170,11 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
     <div className="space-y-6">
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-900 rounded-xl p-6 text-white shadow-lg">
+        <div className="bg-slate-900 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
+          {/* DEBUG RIBBON */}
+          <div className="absolute top-0 right-0 bg-red-600 text-white text-[9px] px-2 py-0.5 font-bold animate-pulse">
+            DEBUG v2.0 ACTIVE
+          </div>
           <div className="flex items-center gap-3 mb-2">
             <Clock className="w-5 h-5 text-orange-500" />
             <h3 className="font-bold text-sm uppercase tracking-wider text-slate-400">Totale Ore Squadra</h3>
