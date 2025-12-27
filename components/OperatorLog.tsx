@@ -19,10 +19,15 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
 
   // ADMIN CHECK
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-  // Admin is true if: Email matches env var OR Rank is high level (DOS/Direttore) - Optional fallback
+
+  // Normalize rank for case-insensitive check
+  const userRank = (user?.rank || '').toLowerCase().trim();
+  const allowedRanks = ['dos', 'direttore', 'ispettore', 'amministratore'];
+
+  // Admin is true if: Email matches env var OR Rank is high level
   const isAdmin = user?.isAuthenticated && (
     (adminEmail && user.email === adminEmail) ||
-    ['DOS', 'Direttore', 'Ispettore'].includes(user.rank || '')
+    allowedRanks.includes(userRank)
   );
 
   // Fetch Operators from Supabase
@@ -320,6 +325,9 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
             )}
           </div>
         )}
+      </div>
+      <div className="mt-8 text-center text-[10px] text-slate-300 font-mono opacity-50">
+        DEBUG INFO: Utente: {user?.name} | Grado: "{user?.rank}" | Admin: {isAdmin ? 'SÌ' : 'NO'}
       </div>
     </div>
   );
