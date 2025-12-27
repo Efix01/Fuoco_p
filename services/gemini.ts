@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { BurnParameters, SimulationResult, ChatMessage } from "../types";
+import { BurnParameters, SimulationResult, ChatMessage, Aspect } from "../types";
 
 // --- CONFIGURAZIONE AI ANTIGRAVITY ---
 
@@ -155,22 +155,49 @@ export const analyzeBurnImage = async (base64Data: string): Promise<Partial<Burn
 };
 
 export const getWeatherFromLocation = async (lat: number, lng: number): Promise<Partial<BurnParameters>> => {
-  const ai = getAiClient();
-  const response = await retryWithBackoff(() => ai.models.generateContent({
-    model: 'gemini-2.0-flash',
-    contents: `Meteo corrente per pianificazione GAUF alle coordinate ${lat}, ${lng}(Sardegna).Restituisci SOLO un JSON valido con temperature(number), humidity(number), windSpeed(number).`,
-    config: {
-      tools: [{ googleSearch: {} }],
-    }
-  }));
-
   try {
-    let text = response.text || "{}";
-    // Clean up markdown code blocks if present
-    text = text.replace(/```json\n ?|\n ? ```/g, '').trim();
-    return JSON.parse(text);
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m`
+    );
+
+    if (!response.ok) throw new Error("Meteo Service Unavailable");
+
+    const data = await response.json();
+    const current = data.current;
+
+    // Conversione Direzione Vento (Gradi -> Aspect)
+    const deg = current.wind_direction_10m;
+    let aspect = Aspect.N;
+    if (deg >= 22.5 && deg < 67.5) aspect = Aspect.NE;
+    else if (deg >= 67.5 && deg < 112.5) aspect = Aspect.E;
+    else if (deg >= 112.5 && deg < 157.5) aspect = Aspect.SE;
+    else if (deg >= 157.5 && deg < 202.5) aspect = Aspect.S;
+    else if (deg >= 202.5 && deg < 247.5) aspect = Aspect.SW;
+    else if (deg >= 247.5 && deg < 292.5) aspect = Aspect.W;
+    else if (deg >= 292.5 && deg < 337.5) aspect = Aspect.NW;
+
+    return {
+      temperature: current.temperature_2m,
+      humidity: current.relative_humidity_2m,
+      windSpeed: current.wind_speed_10m,
+      windDirection: aspect
+    };
+
   } catch (e) {
-    return {};
+    console.warn("OpenMeteo failed, falling back to AI...", e);
+    // Fallback alla vecchia logica AI se OpenMeteo fallisce (ridondanza)
+    const ai = getAiClient();
+    try {
+      const response = await retryWithBackoff(() => ai.models.generateContent({
+        model: 'gemini-2.0-flash',
+        contents: `Meteo corrente a ${lat}, ${lng}. JSON: temperature, humidity, windSpeed.`,
+      }));
+      let text = response.text || "{}";
+      text = text.replace(/```json\n ?|\n ? ```/g, '').trim();
+      return JSON.parse(text);
+    } catch (aiError) {
+      return {};
+    }
   }
 };
 
