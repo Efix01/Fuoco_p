@@ -15,6 +15,7 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
   const [selectedOp, setSelectedOp] = useState<string | null>(null);
   const [hoursToAdd, setHoursToAdd] = useState<number>(4);
   const [newOpName, setNewOpName] = useState('');
+  const [newOpRole, setNewOpRole] = useState<Operator['role']>('Operatore');
   const [creating, setCreating] = useState(false);
 
   // ADMIN CHECK
@@ -82,7 +83,7 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
 
     // Safety check
     if (!isAdmin) {
-      alert("Solo l'amministratore può aggiungere operatori.");
+      alert(`Solo l'amministratore può aggiungere operatori. Il tuo grado attuale è: ${user?.rank || 'Sconosciuto'}`);
       setCreating(false);
       return;
     }
@@ -90,7 +91,7 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
     const newOp = {
       // id: generato da Supabase o UUID locale nel mock
       name: newOpName,
-      role: 'Operatore',
+      role: newOpRole,
       total_hours: 0,
       last_activity: null
     };
@@ -110,6 +111,7 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
         fetchOperators();
       }
       setNewOpName('');
+      setNewOpRole('Operatore'); // Reset role
     } catch (err: any) {
       console.error("Detailed Insert Error:", err);
       // SHOW DETAILED ERROR TO USER
@@ -172,29 +174,45 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
 
         <div className="bg-white rounded-xl p-6 shadow-md border border-slate-100 flex flex-col justify-center">
           {isAdmin ? (
-            <div className="flex gap-2">
-              <input
-                type="text"
-                name="operator_entry_field"
-                autoComplete="off"
-                data-lpignore="true"
-                placeholder="Nuovo Operatore..."
-                value={newOpName}
-                onChange={(e) => setNewOpName(e.target.value)}
-                className="flex-1 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  name="operator_entry_field"
+                  autoComplete="off"
+                  data-lpignore="true"
+                  placeholder="Nuovo Operatore..."
+                  value={newOpName}
+                  onChange={(e) => setNewOpName(e.target.value)}
+                  className="flex-1 border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <select
+                  value={newOpRole}
+                  onChange={(e) => setNewOpRole(e.target.value as Operator['role'])}
+                  className="border rounded-lg px-2 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+                >
+                  <option value="Operatore">Operatore</option>
+                  <option value="Capo Squadra">Capo Squadra</option>
+                  <option value="DOS">DOS</option>
+                  <option value="Autista">Autista</option>
+                </select>
+              </div>
               <button
                 onClick={handleCreateOperator}
                 disabled={!newOpName || creating}
-                className="bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition"
+                className="w-full bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
               >
                 {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
+                <span className="text-sm font-bold">Aggiungi Operatore</span>
               </button>
             </div>
           ) : (
             <div className="text-center text-slate-400 text-xs italic">
               <Lock className="w-4 h-4 mx-auto mb-1 opacity-50" />
               Solo Amministratori/DOS
+              <div className="mt-1 text-[10px] opacity-70">
+                (Il tuo grado: <span className="font-bold">{user?.rank || 'N/A'}</span>)
+              </div>
             </div>
           )}
         </div>
@@ -325,9 +343,6 @@ const OperatorLog: React.FC<OperatorLogProps> = ({ user }) => {
             )}
           </div>
         )}
-      </div>
-      <div className="mt-8 text-center text-[10px] text-slate-300 font-mono opacity-50">
-        DEBUG INFO: Utente: {user?.name} | Grado: "{user?.rank}" | Admin: {isAdmin ? 'SÌ' : 'NO'}
       </div>
     </div>
   );
