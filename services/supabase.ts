@@ -5,14 +5,21 @@ import { createClient } from '@supabase/supabase-js';
 const FAILSAFE_URL = "https://zadjmsbnziualapjjnos.supabase.co";
 const FAILSAFE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphZGptc2Jueml1YWxhcGpqbm9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MzA4NTcsImV4cCI6MjA4MjMwNjg1N30.C_vJ9vaqwB-8hS22kSkOw-3pwVGGf_aw7X6hKLRreC4";
 
-// Queste variabili devono essere configurate nel tuo ambiente Supabase, ma usiamo il fallback se mancano
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || FAILSAFE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || FAILSAFE_KEY;
+// Queste variabili devono essere configurate nel tuo ambiente Supabase, ma usiamo il fallback se mancano o sono corrotte
+let rawUrl = import.meta.env.VITE_SUPABASE_URL;
+let rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log("Supabase Config Check:", {
-  urlExists: !!supabaseUrl,
-  usingFailsafe: supabaseUrl === FAILSAFE_URL,
-  mode: import.meta.env.MODE
+// Validazione Strict: La chiave Anon deve essere un JWT (inizia con "eyJ")
+const isValidKey = (key: string | undefined) => key && key.length > 20 && key.startsWith('eyJ');
+
+const supabaseUrl = (rawUrl && rawUrl.startsWith('http')) ? rawUrl : FAILSAFE_URL;
+const supabaseAnonKey = isValidKey(rawKey) ? rawKey : FAILSAFE_KEY;
+
+console.log("Supabase Connection Check:", {
+  urlUsed: supabaseUrl === FAILSAFE_URL ? 'FAILSAFE' : 'ENV',
+  keyUsed: supabaseAnonKey === FAILSAFE_KEY ? 'FAILSAFE' : 'ENV',
+  keyValid: isValidKey(supabaseAnonKey),
+  envMode: import.meta.env.MODE
 });
 
 /**
