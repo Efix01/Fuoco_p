@@ -166,21 +166,52 @@ const createMockSupabase = () => {
       onAuthStateChange: (callback: (event: string, session: any) => void) => {
         return { data: { subscription: { unsubscribe: () => { } } } };
       },
-      signInWithPassword: async ({ email }: { email: string }) => {
+      signUp: async ({ email, password, options }: any) => {
         await new Promise(resolve => setTimeout(resolve, 500));
-        const mockUser = {
-          id: 'mock-user-id',
-          email: email,
-          user_metadata: {
-            full_name: email.split('@')[0],
-            badge_id: 'GAUF-MOCK',
-            rank: 'Operatore Simulato',
-            unit: 'CFVA Locale'
+
+        try {
+          const users = JSON.parse(localStorage.getItem('gauf_mock_users') || '[]');
+          if (users.find((u: any) => u.email === email)) {
+            return { data: { user: null, session: null }, error: { message: "User already registered" } };
           }
-        };
-        const mockSession = { user: mockUser, access_token: 'mock-token' };
+
+          const newUser = {
+            id: crypto.randomUUID(),
+            email,
+            password, // In a real app never store passwords plainly, but this is a local mock
+            user_metadata: options?.data || {},
+            aud: 'authenticated',
+            created_at: new Date().toISOString()
+          };
+
+          users.push(newUser);
+          localStorage.setItem('gauf_mock_users', JSON.stringify(users));
+
+          // Auto-login on signup for mock convenience, or mimic Supabase requiring email confirmation (optional)
+          // For now, let's return the user but NO session if we want to simulate "check email"
+          // Or return session to allow immediate access. Login.tsx handles "check email" if session is missing.
+          // Let's mimic auto-confirm for mock speed:
+          const session = { access_token: 'mock-token-' + newUser.id, user: newUser };
+          localStorage.setItem('gauf_auth_session', JSON.stringify(session));
+
+          return { data: { user: newUser, session }, error: null };
+        } catch (e: any) {
+          return { data: { user: null, session: null }, error: { message: e.message } };
+        }
+      },
+      signInWithPassword: async ({ email, password }: { email: string, password: string }) => {
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const users = JSON.parse(localStorage.getItem('gauf_mock_users') || '[]');
+        const user = users.find((u: any) => u.email === email && u.password === password);
+
+        if (!user) {
+          return { data: { user: null, session: null }, error: { message: "Invalid login credentials" } };
+        }
+
+        const mockSession = { user: user, access_token: 'mock-token-' + user.id };
         localStorage.setItem('gauf_auth_session', JSON.stringify(mockSession));
-        return { data: { user: mockUser, session: mockSession }, error: null };
+        return { data: { user, session: mockSession }, error: null };
       },
       signOut: async () => {
         localStorage.removeItem('gauf_auth_session');
