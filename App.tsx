@@ -104,6 +104,17 @@ const App: React.FC = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setSession(null);
+    setCurrentUser({
+      id: '',
+      badgeId: '',
+      name: '',
+      rank: '',
+      unit: '',
+      isAuthenticated: false
+    });
+    setCurrentView(View.HOME);
+    setMobileMenuOpen(false);
   };
 
   // GPS Tracking per SOS
