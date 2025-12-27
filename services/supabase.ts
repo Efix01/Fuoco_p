@@ -1,8 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Queste variabili devono essere configurate nel tuo ambiente Supabase
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+console.log("Supabase Config Check:", {
+  urlExists: !!supabaseUrl,
+  urlLength: supabaseUrl?.length,
+  keyExists: !!supabaseAnonKey,
+  keyLength: supabaseAnonKey?.length,
+  mode: import.meta.env.MODE
+});
 
 /**
  * MOCK QUERY BUILDER
