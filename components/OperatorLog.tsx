@@ -145,6 +145,9 @@ const OperatorLog: React.FC = () => {
           <div className="flex gap-2">
             <input
               type="text"
+              name="operator_entry_field"
+              autoComplete="off"
+              data-lpignore="true"
               placeholder="Nuovo Operatore..."
               value={newOpName}
               onChange={(e) => setNewOpName(e.target.value)}
