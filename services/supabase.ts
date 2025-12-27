@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 // Queste variabili devono essere configurate nel tuo ambiente Supabase
@@ -6,71 +5,152 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 /**
- * LOCAL STORAGE ADAPTER FOR MOCK SUPABASE
- * Questo permette all'applicazione di funzionare in modalità "offline/demo"
- * mantenendo la stessa firma API di Supabase.
+ * MOCK QUERY BUILDER
+ * Simula il comportamento di PostgrestBuilder per supportare il chaining
+ * (.select().order().eq()...) e l'esecuzione asincrona (thenable).
  */
-class LocalStorageTable {
-  tableName: string;
+class MockQueryBuilder {
+  private tableName: string;
+  private key: string;
+
+  private op: 'select' | 'insert' | 'update' | 'delete' | null = null;
+  private filters: { col: string; val: any }[] = [];
+  private orderRule: { col: string; ascending: boolean } | null = null;
+  private limitVal: number | null = null;
+  private singleResult = false;
+  private payload: any = null;
 
   constructor(tableName: string) {
-    this.tableName = `gauf_db_${tableName}`;
+    this.tableName = tableName;
+    this.key = `gauf_db_${tableName}`;
   }
 
-  getData(): any[] {
-    const data = localStorage.getItem(this.tableName);
-    return data ? JSON.parse(data) : [];
+  private getData(): any[] {
+    const json = localStorage.getItem(this.key);
+    return json ? JSON.parse(json) : [];
   }
 
-  setData(data: any[]) {
-    localStorage.setItem(this.tableName, JSON.stringify(data));
+  private setData(data: any[]) {
+    localStorage.setItem(this.key, JSON.stringify(data));
   }
 
-  async select() {
-    const data = this.getData();
-    return {
-      data,
-      error: null,
-      order: (col: string, { ascending }: { ascending: boolean } = { ascending: true }) => {
-        const sorted = [...data].sort((a, b) => {
-          if (a[col] < b[col]) return ascending ? -1 : 1;
-          if (a[col] > b[col]) return ascending ? 1 : -1;
-          return 0;
-        });
-        return { data: sorted, error: null };
-      }
-    };
+  // --- CHANABLE METHODS ---
+
+  select(columns = '*') {
+    this.op = 'select';
+    return this;
   }
 
-  async insert(rows: any | any[]) {
-    const current = this.getData();
-    const newRows = Array.isArray(rows) ? rows : [rows];
-    // Add fake ID if missing
-    const toInsert = newRows.map((r: any) => ({ ...r, id: r.id || crypto.randomUUID() }));
-    this.setData([...current, ...toInsert]);
-    return { data: toInsert, error: null };
+  insert(data: any) {
+    this.op = 'insert';
+    this.payload = data;
+    return this;
   }
 
-  update(updates: any) {
-    return {
-      eq: async (col: string, val: any) => {
-        const current = this.getData();
-        const updated = current.map(item => item[col] === val ? { ...item, ...updates } : item);
-        this.setData(updated);
-        return { data: updated, error: null };
-      }
-    };
+  update(data: any) {
+    this.op = 'update';
+    this.payload = data;
+    return this;
   }
 
   delete() {
-    return {
-      eq: async (col: string, val: any) => {
-        const current = this.getData();
-        const filtered = current.filter(item => item[col] !== val);
-        this.setData(filtered);
-        return { error: null };
+    this.op = 'delete';
+    return this;
+  }
+
+  eq(col: string, val: any) {
+    this.filters.push({ col, val });
+    return this;
+  }
+
+  order(col: string, { ascending } = { ascending: true }) {
+    this.orderRule = { col, ascending };
+    return this;
+  }
+
+  limit(n: number) {
+    this.limitVal = n;
+    return this;
+  }
+
+  single() {
+    this.singleResult = true;
+    return this;
+  }
+
+  // --- EXECUTION (THENABLE) ---
+
+  then(resolve: (res: { data: any, error: any }) => void, reject: (err: any) => void) {
+    // Simuliamo latenza di rete
+    setTimeout(() => {
+      try {
+        const result = this.execute();
+        resolve(result);
+      } catch (e) {
+        reject(e);
       }
-    };
+    }, 100);
+  }
+
+  private execute() {
+    let currentData = this.getData();
+    let resultData: any = null;
+
+    if (this.op === 'insert') {
+      const rows = Array.isArray(this.payload) ? this.payload : [this.payload];
+      const newRows = rows.map((r: any) => ({ ...r, id: r.id || crypto.randomUUID(), created_at: new Date().toISOString() }));
+      currentData = [...currentData, ...newRows];
+      this.setData(currentData);
+      resultData = newRows; // Return inserted rows
+    }
+    else if (this.op === 'update') {
+      let updatedCount = 0;
+      currentData = currentData.map((row: any) => {
+        const match = this.filters.every(f => row[f.col] === f.val);
+        if (match) {
+          updatedCount++;
+          return { ...row, ...this.payload };
+        }
+        return row;
+      });
+      this.setData(currentData);
+      // Return updated rows (simulated by re-filtering)
+      resultData = currentData.filter((row: any) => this.filters.every(f => row[f.col] === f.val));
+    }
+    else if (this.op === 'delete') {
+      const initialLen = currentData.length;
+      currentData = currentData.filter((row: any) => !this.filters.every(f => row[f.col] === f.val));
+      this.setData(currentData);
+      resultData = null;
+    }
+    else {
+      // SELECT (default)
+      resultData = currentData.filter((row: any) => this.filters.every(f => row[f.col] === f.val));
+    }
+
+    // Apply Sort
+    if (this.orderRule && Array.isArray(resultData)) {
+      resultData.sort((a: any, b: any) => {
+        const valA = a[this.orderRule!.col];
+        const valB = b[this.orderRule!.col];
+        if (valA < valB) return this.orderRule!.ascending ? -1 : 1;
+        if (valA > valB) return this.orderRule!.ascending ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // Apply Limit
+    if (this.limitVal && Array.isArray(resultData)) {
+      resultData = resultData.slice(0, this.limitVal);
+    }
+
+    // Handle .single()
+    if (this.singleResult) {
+      if (Array.isArray(resultData) && resultData.length > 0) resultData = resultData[0];
+      else if (Array.isArray(resultData) && resultData.length === 0) return { data: null, error: { message: 'No rows found', code: 'PGRST116' } };
+    }
+
+    return { data: resultData, error: null };
   }
 }
 
@@ -87,7 +167,6 @@ const createMockSupabase = () => {
         return { data: { subscription: { unsubscribe: () => { } } } };
       },
       signInWithPassword: async ({ email }: { email: string }) => {
-        // Mock Login
         await new Promise(resolve => setTimeout(resolve, 500));
         const mockUser = {
           id: 'mock-user-id',
@@ -109,16 +188,7 @@ const createMockSupabase = () => {
       },
     },
     from: (table: string) => {
-      const db = new LocalStorageTable(table);
-      return {
-        select: (query?: string) => {
-          // Mock semplice di select, ignora query string complessa per ora
-          return db.select();
-        },
-        insert: (data: any) => db.insert(data),
-        update: (data: any) => db.update(data),
-        delete: () => db.delete(),
-      };
+      return new MockQueryBuilder(table);
     }
   };
 };
