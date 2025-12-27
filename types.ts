@@ -56,7 +56,7 @@ export interface SimulationResult {
   riskAssessment: string;
   trainingTip: string;
   tacticalAdvice: string;
-  reasoningPath?: string; 
+  reasoningPath?: string;
 }
 
 export interface ChatMessage {
@@ -76,8 +76,8 @@ export interface Operator {
   id: string;
   name: string;
   role: 'Operatore' | 'Capo Squadra' | 'DOS' | 'Autista';
-  totalHours: number;
-  lastActivity: string | null;
+  total_hours: number;
+  last_activity: string | null;
 }
 
 export interface VideoTutorial {
