@@ -224,6 +224,8 @@ const createMockSupabase = () => {
   };
 };
 
-export const supabase = (supabaseUrl && supabaseUrl.trim() !== '' && supabaseAnonKey && supabaseAnonKey.trim() !== '')
+const client = (supabaseUrl && supabaseUrl.trim() !== '' && supabaseAnonKey && supabaseAnonKey.trim() !== '')
   ? createClient(supabaseUrl, supabaseAnonKey)
   : (createMockSupabase() as any);
+
+export const supabase = client;
