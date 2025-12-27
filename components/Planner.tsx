@@ -82,7 +82,7 @@ const Planner: React.FC<PlannerProps> = ({ onResultGenerated, initialParams, ini
             RESET
           </button>
 
-          <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={async (e) => {
+          <input type="file" ref={fileInputRef} className="hidden" accept="image/*" capture="environment" onChange={async (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
             setAnalyzingPhoto(true);

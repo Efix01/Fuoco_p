@@ -127,7 +127,7 @@ export const analyzeBurnImage = async (base64Data: string): Promise<Partial<Burn
     contents: {
       parts: [
         { inlineData: { data: base64, mimeType: 'image/jpeg' } },
-        { text: "Rilevamento parametri forestali AI per GAUF Sardegna. Estrai Temp, UR, Slope, FuelType (incluso Bosco se presente) e Aspect (N/S/E/W) dalle ombre. JSON." }
+        { text: "Rilevamento parametri forestali AI per GAUF Sardegna. Estrai Temp, UR, Slope, Aspect (N/S/E/W). Per 'fuelType', SCEGLI ESATTAMENTE UNO tra: 'Macchia Bassa (0.5m)', 'Macchia Alta (1.5m+)', 'Bosco (Fustaia/Ceduo)', 'Erba Secca', 'Sottobosco Pineta'. Rispondi SOLO JSON." }
       ]
     },
     config: {
