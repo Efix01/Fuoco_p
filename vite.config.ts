@@ -4,7 +4,10 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '');
+  // Load .env files and merge with process.env (critical for Vercel)
+  const envFile = loadEnv(mode, '.', '');
+  const env = { ...process.env, ...envFile };
+
   return {
     server: {
       port: 3000,
