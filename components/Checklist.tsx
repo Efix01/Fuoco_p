@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChecklistItem } from '../types';
-import { CheckCircle2, Circle, ShieldAlert } from 'lucide-react';
+import { CheckCircle2, Circle, ShieldAlert, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 
 const INITIAL_ITEMS: ChecklistItem[] = [
   // Briefing
@@ -19,96 +19,158 @@ const INITIAL_ITEMS: ChecklistItem[] = [
 
 const Checklist: React.FC = () => {
   const [items, setItems] = useState<ChecklistItem[]>(INITIAL_ITEMS);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>('Briefing');
 
   const toggleItem = (id: string) => {
-    setItems(prev => prev.map(item => 
+    setItems(prev => prev.map(item =>
       item.id === id ? { ...item, checked: !item.checked } : item
     ));
   };
 
-  const getProgress = () => {
-    const checked = items.filter(i => i.checked).length;
-    return Math.round((checked / items.length) * 100);
-  };
+  const completedCount = items.filter(i => i.checked).length;
+  const totalCount = items.length;
+  const progressPercentage = Math.round((completedCount / totalCount) * 100);
 
   const categories = Array.from(new Set(items.map(i => i.category)));
 
+  // Calcola raggio e circonferenza per il cerchio SVG
+  const radius = 35;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progressPercentage / 100) * circumference;
+
+  const getProgressColor = () => {
+    if (progressPercentage < 30) return 'text-red-500';
+    if (progressPercentage < 70) return 'text-orange-500';
+    return 'text-emerald-500';
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 h-full max-w-3xl mx-auto">
-      <div className="flex justify-between items-end mb-6">
+    <div className="bg-white rounded-[2.5rem] shadow-2xl p-6 md:p-8 h-full max-w-4xl mx-auto border border-slate-100 flex flex-col relative overflow-hidden">
+
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-500 via-red-500 to-emerald-500" />
+
+      {/* Header Dashboard */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
         <div>
-           <h2 className="text-2xl font-bold text-slate-800">Protocollo Operativo</h2>
-           <p className="text-slate-500 text-sm">Checklist standard GAUF</p>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tight uppercase mb-2">Protocollo Operativo</h2>
+          <p className="text-slate-500 font-medium text-sm flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-orange-500" />
+            Standard GAUF Safety Check
+          </p>
         </div>
-        <div className="text-right">
-           <span className="text-3xl font-bold text-emerald-600">{getProgress()}%</span>
-           <span className="block text-xs text-slate-400 uppercase font-semibold">Completato</span>
+
+        {/* Circular Progress Ring */}
+        <div className="relative w-24 h-24 flex items-center justify-center">
+          <svg className="w-full h-full transform -rotate-90">
+            <circle
+              className="text-slate-100"
+              strokeWidth="8"
+              stroke="currentColor"
+              fill="transparent"
+              r={radius}
+              cx="48"
+              cy="48"
+            />
+            <circle
+              className={`transition-all duration-1000 ease-out ${getProgressColor()}`}
+              strokeWidth="8"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+              stroke="currentColor"
+              fill="transparent"
+              r={radius}
+              cx="48"
+              cy="48"
+            />
+          </svg>
+          <div className="absolute flex flex-col items-center">
+            <span className={`text-xl font-black ${getProgressColor()}`}>{progressPercentage}%</span>
+          </div>
         </div>
       </div>
 
-      {/* L.A.C.E.S. Reminder Section */}
-      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-        <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-orange-500" />
-          L.A.C.E.S. Safety Reminder
+      {/* L.A.C.E.S. Sticky Banner */}
+      <div className="bg-slate-900 rounded-2xl p-5 mb-8 text-white shadow-xl shadow-slate-900/10">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500 mb-4 flex items-center gap-2">
+          <ShieldAlert className="w-4 h-4" />
+          Safety First: L.A.C.E.S.
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-xs text-slate-600">
-          <div className="flex gap-2 items-start">
-            <span className="font-bold text-slate-900 bg-white border border-slate-200 w-5 h-5 flex items-center justify-center rounded shadow-sm shrink-0">L</span>
-            <span className="mt-0.5"><strong>Lookout:</strong> Vedetta sempre attiva e in posizione.</span>
-          </div>
-          <div className="flex gap-2 items-start">
-            <span className="font-bold text-slate-900 bg-white border border-slate-200 w-5 h-5 flex items-center justify-center rounded shadow-sm shrink-0">A</span>
-            <span className="mt-0.5"><strong>Anchor:</strong> Punto di ancoraggio sicuro e definito.</span>
-          </div>
-          <div className="flex gap-2 items-start">
-            <span className="font-bold text-slate-900 bg-white border border-slate-200 w-5 h-5 flex items-center justify-center rounded shadow-sm shrink-0">C</span>
-            <span className="mt-0.5"><strong>Comm:</strong> Comunicazioni radio chiare e verificate.</span>
-          </div>
-          <div className="flex gap-2 items-start">
-            <span className="font-bold text-slate-900 bg-white border border-slate-200 w-5 h-5 flex items-center justify-center rounded shadow-sm shrink-0">E</span>
-            <span className="mt-0.5"><strong>Escape:</strong> Vie di fuga note a tutto il personale.</span>
-          </div>
-          <div className="flex gap-2 items-start col-span-1 sm:col-span-2">
-            <span className="font-bold text-slate-900 bg-white border border-slate-200 w-5 h-5 flex items-center justify-center rounded shadow-sm shrink-0">S</span>
-            <span className="mt-0.5"><strong>Safety:</strong> Zone di sicurezza (oasi) accessibili rapidamente.</span>
-          </div>
+        <div className="flex justify-between items-center px-2">
+          {['Lookout', 'Anchor', 'Comm', 'Escape', 'Safety'].map((word, i) => (
+            <div key={i} className="text-center group cursor-default">
+              <div className="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center font-black text-sm mb-1 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                {word[0]}
+              </div>
+              <span className="text-[9px] font-bold text-slate-400 uppercase hidden md:block group-hover:text-orange-400 transition-colors">{word}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="space-y-6">
-        {categories.map(cat => (
-          <div key={cat}>
-            <h3 className="text-sm font-bold text-slate-400 uppercase mb-3 border-b pb-1">{cat}</h3>
-            <div className="space-y-2">
-              {items.filter(i => i.category === cat).map(item => (
-                <div 
-                  key={item.id} 
-                  onClick={() => toggleItem(item.id)}
-                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition select-none ${
-                    item.checked ? 'bg-emerald-50' : 'hover:bg-slate-50'
-                  }`}
-                >
-                  {item.checked ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-slate-300 flex-shrink-0 mt-0.5" />
-                  )}
-                  <span className={`text-sm ${item.checked ? 'text-emerald-800 font-medium line-through decoration-emerald-300' : 'text-slate-700'}`}>
-                    {item.text}
+      <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+        {categories.map(cat => {
+          const catItems = items.filter(i => i.category === cat);
+          const isAllChecked = catItems.every(i => i.checked);
+          const isExpanded = expandedCategory === cat;
+
+          return (
+            <div key={cat} className={`border transition-all duration-300 rounded-2xl overflow-hidden ${isAllChecked ? 'border-emerald-500/30 bg-emerald-50/30' : 'border-slate-200 bg-white'}`}>
+              <button
+                onClick={() => setExpandedCategory(isExpanded ? null : cat)}
+                className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black border ${isAllChecked ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 text-slate-500 border-slate-200'
+                    }`}>
+                    {isAllChecked ? <CheckCircle2 className="w-4 h-4" /> : catItems.length}
+                  </div>
+                  <span className={`text-sm font-black uppercase tracking-wider ${isAllChecked ? 'text-emerald-700' : 'text-slate-700'}`}>
+                    {cat}
                   </span>
                 </div>
-              ))}
+                {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+              </button>
+
+              {isExpanded && (
+                <div className="px-5 pb-5 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                  {catItems.map(item => (
+                    <div
+                      key={item.id}
+                      onClick={() => toggleItem(item.id)}
+                      className={`flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-all duration-200 border-l-4 group ${item.checked
+                          ? 'bg-emerald-100/50 border-emerald-500 shadow-sm'
+                          : 'bg-slate-50 border-transparent hover:bg-slate-100'
+                        }`}
+                    >
+                      <div className={`mt-0.5 transform transition-all duration-300 ${item.checked ? 'scale-110' : 'group-hover:scale-110'}`}>
+                        {item.checked ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 " />
+                        ) : (
+                          <Circle className="w-5 h-5 text-slate-300 group-hover:text-slate-400" />
+                        )}
+                      </div>
+                      <span className={`text-sm font-medium leading-relaxed ${item.checked ? 'text-emerald-900 line-through opacity-60' : 'text-slate-700'}`}>
+                        {item.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
-      
-      <button 
-        onClick={() => setItems(INITIAL_ITEMS)}
-        className="mt-6 w-full text-slate-400 text-sm hover:text-slate-600 underline"
+
+      <button
+        onClick={() => {
+          if (confirm('Resettare l\'intera checklist?')) setItems(INITIAL_ITEMS);
+        }}
+        className="mt-8 mx-auto flex items-center gap-2 text-slate-400 text-xs font-bold hover:text-red-500 transition-colors px-4 py-2 rounded-full hover:bg-red-50"
       >
-        Resetta Checklist
+        <RotateCcw className="w-3 h-3" />
+        RESETTA PROTOCOLLO
       </button>
     </div>
   );
