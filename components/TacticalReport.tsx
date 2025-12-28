@@ -233,22 +233,29 @@ const TacticalReport: React.FC<TacticalReportProps> = ({ params, result, user, g
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className="bg-slate-900 text-white p-5 rounded-2xl relative overflow-hidden group">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* Flame Length Card */}
+              <div className="bg-slate-900 border-l-8 border-orange-500 text-white p-6 rounded-2xl relative overflow-hidden group shadow-xl">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                  <Flame className="w-16 h-16" />
+                  <Flame className="w-24 h-24" />
                 </div>
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Lunghezza Fiamma (FL)</p>
-                <p className="text-4xl font-black">{result.flameLength}</p>
-                <p className="text-[10px] text-slate-500 mt-1">Metri stimati</p>
+                <div className="relative z-10">
+                  <p className="text-xs font-black text-orange-400 uppercase mb-2 tracking-widest">Lunghezza Fiamma (FL)</p>
+                  <p className="text-5xl md:text-6xl font-black mb-1 text-white tabular-nums tracking-tighter">{result.flameLength}</p>
+                  <p className="text-xs text-slate-400 font-bold uppercase">Metri stimati</p>
+                </div>
               </div>
-              <div className="bg-slate-900 text-white p-5 rounded-2xl relative overflow-hidden group">
+
+              {/* ROS Card */}
+              <div className="bg-slate-900 border-l-8 border-blue-500 text-white p-6 rounded-2xl relative overflow-hidden group shadow-xl">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                  <Wind className="w-16 h-16" />
+                  <Wind className="w-24 h-24" />
                 </div>
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Velocità Avanzamento (ROS)</p>
-                <p className="text-4xl font-black">{result.ros}</p>
-                <p className="text-[10px] text-slate-500 mt-1">Metri / minuto</p>
+                <div className="relative z-10">
+                  <p className="text-xs font-black text-blue-400 uppercase mb-2 tracking-widest">Velocità Avanzamento (ROS)</p>
+                  <p className="text-5xl md:text-6xl font-black mb-1 text-white tabular-nums tracking-tighter">{result.ros}</p>
+                  <p className="text-xs text-slate-400 font-bold uppercase">Metri / minuto</p>
+                </div>
               </div>
             </div>
 
