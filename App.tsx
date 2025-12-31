@@ -9,8 +9,8 @@ import MapEditor from './components/MapEditor';
 import OperatorLog from './components/OperatorLog';
 import CfvaLogo from './components/CfvaLogo';
 import Login from './components/Login'; // Import Login
-import { supabase } from './services/supabase'; // Import Supabase
-import { Flame, ClipboardList, GraduationCap, Menu, X, Map as MapIcon, Users, LayoutDashboard, Shield, FileText, Lock, AlertTriangle, Radio, LocateFixed, Satellite, LogOut } from 'lucide-react';
+import { supabase, isOnlineMode } from './services/supabase'; // Import Supabase and online check
+import { Flame, ClipboardList, GraduationCap, Menu, X, Map as MapIcon, Users, LayoutDashboard, Shield, FileText, Lock, AlertTriangle, Radio, LocateFixed, Satellite, LogOut, Info, Settings, ShieldAlert } from 'lucide-react';
 import Welcome from './components/Welcome'; // Import Welcome
 
 const INITIAL_PARAMS: BurnParameters = {
@@ -344,6 +344,33 @@ const App: React.FC = () => {
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden bg-slate-100/50 relative">
+
+          {/* DIAGNOSTIC BANNER FOR VERCEL / OFFLINE MODE */}
+          {!isOnlineMode && (
+            <div className="bg-amber-50 border-b border-amber-200 p-4 animate-in slide-in-from-top duration-500 z-40">
+              <div className="max-w-7xl mx-auto flex items-start gap-3">
+                <ShieldAlert className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-amber-900 flex items-center gap-2">
+                    MODALITÀ OFFLINE (DATABASE LOCALE)
+                  </h3>
+                  <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                    L'applicazione non rileva le chiavi di connessione al database Cloud (Supabase).
+                    Se sei su <strong>Vercel</strong>, devi aggiungere le seguenti variabili nelle impostazioni del progetto:
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <code className="text-[10px] bg-white px-2 py-1 rounded border border-amber-200 font-bold text-amber-800">VITE_SUPABASE_URL</code>
+                    <code className="text-[10px] bg-white px-2 py-1 rounded border border-amber-200 font-bold text-amber-800">VITE_SUPABASE_ANON_KEY</code>
+                    <code className="text-[10px] bg-white px-2 py-1 rounded border border-amber-200 font-bold text-amber-800">VITE_GOOGLE_API_KEY</code>
+                  </div>
+                  <p className="text-[10px] text-amber-600 mt-2 font-medium">
+                    Dopo averle aggiunte, esegui un <strong>Redeploy</strong> su Vercel.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className={`flex-1 flex flex-col max-w-7xl mx-auto w-full h-full ${currentView === View.MAP ? 'p-0 overflow-hidden' : 'p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto'
             }`}>
             {currentView !== View.HOME && (
