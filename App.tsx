@@ -9,8 +9,8 @@ import MapEditor from './components/MapEditor';
 import OperatorLog from './components/OperatorLog';
 import CfvaLogo from './components/CfvaLogo';
 import Login from './components/Login'; // Import Login
-import { supabase, isOnlineMode } from './services/supabase'; // Import Supabase and online check
-import { Flame, ClipboardList, GraduationCap, Menu, X, Map as MapIcon, Users, LayoutDashboard, Shield, FileText, Lock, AlertTriangle, Radio, LocateFixed, Satellite, LogOut, Info, Settings, ShieldAlert } from 'lucide-react';
+import { supabase } from './services/supabase'; // Import Supabase
+import { Flame, ClipboardList, GraduationCap, Menu, X, Map as MapIcon, Users, LayoutDashboard, Shield, FileText, Lock, AlertTriangle, Radio, LocateFixed, Satellite, LogOut } from 'lucide-react';
 import Welcome from './components/Welcome'; // Import Welcome
 
 const INITIAL_PARAMS: BurnParameters = {
