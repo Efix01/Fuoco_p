@@ -1,23 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
-// FAILSAFE CONSTANTS (Public Anon Keys)
-// Inseriti direttamente per garantire il funzionamento su Vercel bypassando problemi di env vars
-const FAILSAFE_URL = "https://zadjmsbnziualapjjnos.supabase.co";
-const FAILSAFE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphZGptc2Jueml1YWxhcGpqbm9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MzA4NTcsImV4cCI6MjA4MjMwNjg1N30.C_vJ9vaqwB-8hS22kSkOw-3pwVGGf_aw7X6hKLRreC4";
-
-// Queste variabili devono essere configurate nel tuo ambiente Supabase, ma usiamo il fallback se mancano o sono corrotte
+// Queste variabili devono essere configurate nel tuo ambiente Supabase (file .env o Vercel)
 let rawUrl = import.meta.env.VITE_SUPABASE_URL;
 let rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Validazione Strict: La chiave Anon deve essere un JWT (inizia con "eyJ")
 const isValidKey = (key: string | undefined) => key && key.length > 20 && key.startsWith('eyJ');
 
-const supabaseUrl = (rawUrl && rawUrl.startsWith('http')) ? rawUrl : FAILSAFE_URL;
-const supabaseAnonKey = isValidKey(rawKey) ? rawKey : FAILSAFE_KEY;
+const supabaseUrl = (rawUrl && rawUrl.startsWith('http')) ? rawUrl : '';
+const supabaseAnonKey = isValidKey(rawKey) ? rawKey : '';
 
 console.log("Supabase Connection Check:", {
-  urlUsed: supabaseUrl === FAILSAFE_URL ? 'FAILSAFE' : 'ENV',
-  keyUsed: supabaseAnonKey === FAILSAFE_KEY ? 'FAILSAFE' : 'ENV',
+  urlUsed: supabaseUrl ? 'ENV' : 'MISSING',
+  keyUsed: supabaseAnonKey ? 'ENV' : 'MISSING',
   keyValid: isValidKey(supabaseAnonKey),
   envMode: import.meta.env.MODE
 });
@@ -247,6 +242,6 @@ const client = (supabaseUrl && supabaseUrl.trim() !== '' && supabaseAnonKey && s
   : (createMockSupabase() as any);
 
 export const supabase = client;
-export const isSupabaseOnline = (supabaseUrl !== FAILSAFE_URL) || (supabaseUrl === FAILSAFE_URL); // Always online now due to failsafe, but logic preserved for clarity
+export const isSupabaseOnline = !!(supabaseUrl && supabaseAnonKey); // Online if we have keys to connect 
 // Actually, let's simplify: isOnline is true if we used createClient
 export const isOnlineMode = (supabaseUrl && supabaseUrl.trim() !== '' && supabaseAnonKey && supabaseAnonKey.trim() !== '');
