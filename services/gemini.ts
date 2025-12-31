@@ -18,8 +18,16 @@ export const checkApiKey = async (): Promise<void> => {
 };
 
 const getAiClient = () => {
-  const key = (import.meta.env && import.meta.env.VITE_GOOGLE_API_KEY) || (process.env as any).API_KEY; // Fallback for flexibility
-  if (!key) throw new Error("API Key mancante. Configura VITE_GOOGLE_API_KEY nel file .env");
+  // Prioritize VITE_ env var, then fallback to safe process check (mostly for dev/tests)
+  const viteKey = import.meta.env.VITE_GOOGLE_API_KEY;
+  const processKey = (typeof process !== 'undefined' && process.env) ? (process.env as any).API_KEY : undefined;
+
+  const key = viteKey || processKey;
+
+  if (!key) {
+    console.error("API Key mancante! Configura VITE_GOOGLE_API_KEY su Vercel.");
+    throw new Error("API Key non trovata. Controlla le impostazioni di Vercel.");
+  }
   return new GoogleGenAI({ apiKey: key });
 };
 
