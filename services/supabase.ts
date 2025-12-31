@@ -10,12 +10,16 @@ const isValidKey = (key: string | undefined) => key && key.length > 20 && key.st
 const supabaseUrl = (rawUrl && rawUrl.startsWith('http')) ? rawUrl : '';
 const supabaseAnonKey = isValidKey(rawKey) ? rawKey : '';
 
-console.log("Supabase Connection Check:", {
-  urlUsed: supabaseUrl ? 'ENV' : 'MISSING',
-  keyUsed: supabaseAnonKey ? 'ENV' : 'MISSING',
-  keyValid: isValidKey(supabaseAnonKey),
-  envMode: import.meta.env.MODE
+console.log("Supabase Configuration:", {
+  url: supabaseUrl ? 'Configured' : 'MISSING',
+  key: supabaseAnonKey ? 'Configured' : 'MISSING',
+  mode: import.meta.env.MODE,
+  isMock: !supabaseUrl || !supabaseAnonKey
 });
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn("⚠️ ATTENZIONE: Variabili d'ambiente Supabase non trovate. L'app funzionerà in modalità OFFLINE/MOCK.");
+}
 
 /**
  * MOCK QUERY BUILDER
