@@ -269,7 +269,7 @@ const App: React.FC = () => {
       <main className="flex-1 min-h-screen relative overflow-x-hidden pt-4 md:pt-0">
         <div className="p-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
           {currentView === View.HOME && <Home onNavigate={setCurrentView} onLogout={handleLogout} />}
-          {currentView === View.PLANNER && <Planner onAnalysisComplete={handleAnalysisComplete} />}
+          {currentView === View.PLANNER && <Planner onResultGenerated={handleAnalysisComplete} initialParams={lastParams} initialResult={lastResult} />}
           {currentView === View.MAP && <MapEditor />}
           {currentView === View.REPORT && lastResult && <TacticalReport params={lastParams!} result={lastResult!} />}
           {currentView === View.CHECKLIST && <Checklist />}
