@@ -83,7 +83,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <ShieldCheck className="w-64 h-64 text-emerald-500" />
       </div>
 
-      <div className="w-full max-w-md animate-in fade-in zoom-in duration-500">
+      <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           <div className="bg-slate-800 p-8 text-center border-b-4 border-orange-500">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-slate-900 mb-4 shadow-inner">

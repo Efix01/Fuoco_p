@@ -11,7 +11,7 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ onNavigate, onLogout }) => {
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-8 text-white shadow-xl border border-slate-700 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-5">

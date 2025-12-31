@@ -173,8 +173,12 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-orange-500"></div>
+      <div style={{ padding: 50, background: 'yellow', color: 'black', height: '100vh', fontSize: 24 }}>
+        <h1>STATO: CARICAMENTO IN CORSO...</h1>
+        <p>Se vedi questo messaggio per più di 5 secondi, c'è un problema con Supabase.</p>
+        <button onClick={() => setLoading(false)} style={{ padding: 20, background: 'black', color: 'white' }}>
+          FORZA AVVIO APP
+        </button>
       </div>
     );
   }
@@ -191,266 +195,96 @@ const App: React.FC = () => {
     return <Login onLogin={(user) => updateUserFromSession(user)} />;
   }
 
+  // Render main application UI
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row animate-in fade-in duration-700 font-sans">
-
-      {/* SOS MODAL OVERLAY */}
-      {sosActive && (
-        <div className="fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in zoom-in duration-300">
-          <div className="bg-red-600 w-full max-w-lg rounded-3xl p-8 text-white shadow-2xl border-4 border-red-500 animate-pulse-slow relative">
-            <button
-              onClick={() => setSosActive(false)}
-              className="absolute top-4 right-4 bg-red-800 hover:bg-red-900 p-2 rounded-full transition"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <div className="text-center mb-8">
-              <div className="bg-white/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                <AlertTriangle className="w-12 h-12 text-white" />
-              </div>
-              <h2 className="text-3xl font-black uppercase tracking-widest mb-1">MAYDAY</h2>
-              <p className="font-bold opacity-80 text-sm tracking-wide">PROTOCOLLO SICUREZZA GAUF ATTIVO</p>
-            </div>
-
-            <div className="bg-black/20 rounded-2xl p-6 mb-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/20 pb-2">
-                <span className="uppercase text-xs font-bold opacity-60 flex items-center gap-2"><LocateFixed className="w-4 h-4" /> GPS Tracking</span>
-                <span className="font-mono text-xl font-bold flex items-center gap-2">
-                  {coords ? `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}` : 'Ricerca Satelliti...'}
-                  <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                  </span>
-                </span>
-              </div>
-              <div className="flex items-center justify-between border-b border-white/20 pb-2">
-                <span className="uppercase text-xs font-bold opacity-60 flex items-center gap-2"><Radio className="w-4 h-4" /> Canale Radio</span>
-                <span className="font-mono text-xl font-bold">SOUP CA - CH 16</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="uppercase text-xs font-bold opacity-60">Orario Zulu</span>
-                <span className="font-mono text-xl font-bold">{new Date().toISOString().split('T')[1].slice(0, 5)} Z</span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => alert("Coordinate inviate alla SOUP Cagliari!")}
-              className="w-full bg-white text-red-600 font-black py-4 rounded-xl text-lg uppercase tracking-wider hover:bg-slate-100 transition shadow-xl flex items-center justify-center gap-2"
-            >
-              <Satellite className="w-6 h-6" />
-              Invia Posizione a SOUP
-            </button>
+    <div className="flex flex-col md:flex-row min-h-screen bg-slate-50">
+      {/* MOBILE HEADER */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-slate-900 text-white shadow-lg sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8">
+            <CfvaLogo className="w-full h-full" />
+          </div>
+          <div>
+            <h1 className="text-sm font-black leading-none">CFVA</h1>
+            <p className="text-[8px] font-bold text-orange-500 uppercase tracking-widest">Fuoco Prescritto</p>
           </div>
         </div>
-      )}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 hover:bg-slate-800 rounded-lg transition-colors border border-slate-700"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
 
-      {/* Sidebar Navigation */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } flex flex-col shadow-2xl`}>
-        <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-          <div onClick={() => setCurrentView(View.HOME)} className="cursor-pointer group flex items-center gap-3">
-            <CfvaLogo className="w-10 h-10 drop-shadow-md" />
-            <div>
-              <h1 className="text-sm font-black text-white leading-tight">
-                CORPO FORESTALE
-              </h1>
-              <p className="text-[9px] text-orange-500 font-bold uppercase tracking-widest">Regione Sardegna</p>
-            </div>
+      {/* SIDEBAR NAVIGATION */}
+      <aside className={`
+        fixed md:sticky top-0 left-0 z-40
+        w-72 h-screen bg-slate-900 text-slate-100 flex flex-col p-6 shadow-2xl transition-transform duration-300 ease-in-out
+        ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        <div className="mb-10 flex items-center gap-4 px-2">
+          <div className="w-12 h-12 bg-white/5 rounded-xl p-1.5 border border-white/10 shadow-inner">
+            <CfvaLogo className="w-full h-full drop-shadow-lg" />
           </div>
-          <button onClick={() => setMobileMenuOpen(false)} className="md:hidden text-slate-400 hover:text-white">
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center gap-3 bg-slate-800/30">
-          <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600 shadow-inner overflow-hidden">
-            {/* Avatar placeholder o icona utente */}
-            <div className="font-bold text-slate-400">{currentUser.name.charAt(0)}</div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
-            <p className="text-[10px] text-slate-400 truncate uppercase tracking-tight">{currentUser.rank}</p>
+          <div>
+            <h1 className="text-2xl font-black leading-none tracking-tighter">CFVA</h1>
+            <p className="text-[10px] font-bold text-orange-500 uppercase tracking-[0.2em]">Fuoco Prescritto</p>
           </div>
         </div>
 
-        <div className="px-4 py-2">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-red-900/50 text-slate-300 hover:text-red-200 py-2 rounded-lg transition border border-slate-700 hover:border-red-800 group"
-          >
-            <LogOut className="w-4 h-4 group-hover:scale-110 transition" />
-            <span className="text-xs font-bold uppercase tracking-wider">Disconnetti</span>
-          </button>
-        </div>
-
-        <nav className="p-4 space-y-1.5 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700">
-          <p className="px-4 pt-2 pb-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">Pianificazione</p>
+        <nav className="flex-1 space-y-2">
           <NavItem view={View.HOME} icon={LayoutDashboard} />
           <NavItem view={View.PLANNER} icon={Flame} />
           <NavItem view={View.MAP} icon={MapIcon} />
-
-          <div className="h-4"></div>
-          <p className="px-4 pt-2 pb-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">Operatività</p>
           <NavItem view={View.REPORT} icon={FileText} disabled={!lastResult} />
           <NavItem view={View.CHECKLIST} icon={ClipboardList} />
-          <NavItem view={View.OPERATORS} icon={Users} />
-
-          <div className="h-4"></div>
-          <p className="px-4 pt-2 pb-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">Academy</p>
           <NavItem view={View.TRAINING} icon={GraduationCap} />
+          <NavItem view={View.OPERATORS} icon={Users} />
         </nav>
 
-        <div className="p-4 border-t border-slate-800">
-          <div className="bg-slate-800/50 rounded-xl p-4 text-center border border-slate-700/50">
-            <p className="text-[10px] text-slate-500 leading-relaxed italic">
-              Accesso Operativo Certificato<br />
-              Badge: <strong className="text-slate-400">{currentUser.badgeId}</strong>
-              <br />
-              <span className="text-slate-500 mt-2 block font-medium opacity-70">Creator App. Efisio Pala</span>
-            </p>
+        <div className="mt-auto pt-6 border-t border-slate-800">
+          <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700 mb-4 group hover:bg-slate-800 transition-colors">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">
+                {currentUser.name.charAt(0)}
+              </div>
+              <div className="overflow-hidden">
+                <p className="text-sm font-bold truncate">{currentUser.name}</p>
+                <p className="text-[10px] text-slate-500 font-mono uppercase truncate">{currentUser.badgeId}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 py-2 mt-2 bg-slate-700/50 hover:bg-red-500/20 hover:text-red-400 text-slate-400 rounded-lg text-xs font-bold transition group-hover:bg-slate-700"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              CHIUDI SESSIONE
+            </button>
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-
-        {/* TOP RIGHT GPS/SOS BUTTON - ALWAYS VISIBLE */}
-        <div className="absolute top-4 right-4 md:top-6 md:right-8 z-50">
-          <button
-            onClick={() => setSosActive(true)}
-            className={`flex items-center gap-2 pl-3 pr-4 py-2 rounded-full font-black text-xs uppercase tracking-wider transition-all shadow-xl hover:scale-105 active:scale-95 border-2 ${gpsActive
-              ? 'bg-white text-red-600 border-red-600 hover:bg-red-600 hover:text-white hover:border-red-700'
-              : 'bg-slate-800 text-slate-400 border-slate-600'
-              }`}
-          >
-            <div className={`w-2 h-2 rounded-full ${gpsActive ? 'bg-red-600 animate-pulse' : 'bg-slate-500'}`}></div>
-            GPS REC / SOS
-          </button>
-        </div>
-
-        {/* Mobile Header */}
-        <div className="md:hidden bg-white border-b p-4 flex justify-between items-center shadow-sm z-10 sticky top-0">
-          <div className="flex items-center gap-3">
-            <CfvaLogo className="w-8 h-8" />
-            <h1 className="font-bold text-slate-800 text-sm leading-tight">
-              CFVA <br /><span className="text-orange-600 text-xs">Fuoco Prescritto</span>
-            </h1>
-          </div>
-          <button onClick={() => setMobileMenuOpen(true)} className="text-slate-600 p-2">
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-
-        <div className="flex-1 flex flex-col overflow-hidden bg-slate-100/50 relative">
-
-          {/* DIAGNOSTIC BANNER FOR VERCEL / OFFLINE MODE */}
-          {!isOnlineMode && (
-            <div className="bg-amber-50 border-b border-amber-200 p-4 animate-in slide-in-from-top duration-500 z-40">
-              <div className="max-w-7xl mx-auto flex items-start gap-3">
-                <ShieldAlert className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="text-sm font-bold text-amber-900 flex items-center gap-2">
-                    MODALITÀ OFFLINE (DATABASE LOCALE)
-                  </h3>
-                  <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                    L'applicazione non rileva le chiavi di connessione al database Cloud (Supabase).
-                    Se sei su <strong>Vercel</strong>, devi aggiungere le seguenti variabili nelle impostazioni del progetto:
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <code className="text-[10px] bg-white px-2 py-1 rounded border border-amber-200 font-bold text-amber-800">VITE_SUPABASE_URL</code>
-                    <code className="text-[10px] bg-white px-2 py-1 rounded border border-amber-200 font-bold text-amber-800">VITE_SUPABASE_ANON_KEY</code>
-                    <code className="text-[10px] bg-white px-2 py-1 rounded border border-amber-200 font-bold text-amber-800">VITE_GOOGLE_API_KEY</code>
-                  </div>
-                  <p className="text-[10px] text-amber-600 mt-2 font-medium">
-                    Dopo averle aggiunte, esegui un <strong>Redeploy</strong> su Vercel.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className={`flex-1 flex flex-col max-w-7xl mx-auto w-full h-full ${currentView === View.MAP ? 'p-0 overflow-hidden' : 'p-4 md:p-8 pb-24 md:pb-8 overflow-y-auto'
-            }`}>
-            {currentView !== View.HOME && (
-              <header className="mb-8 hidden md:block flex-shrink-0 animate-in slide-in-from-top-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-orange-100 text-orange-600 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">GAUF SYSTEM</span>
-                  <span className="text-[10px] text-slate-400 font-mono">{new Date().toLocaleDateString()}</span>
-                </div>
-                <h2 className="text-3xl font-black text-slate-800 tracking-tight">{currentView}</h2>
-                <p className="text-slate-500 mt-1 text-sm font-medium">Strumento certificato per operazioni CFVA Sardegna.</p>
-              </header>
-            )}
-
-            <div className="flex-1 min-h-0">
-              {currentView === View.HOME && <Home onNavigate={setCurrentView} onLogout={handleLogout} />}
-              {currentView === View.PLANNER && (
-                <Planner
-                  onResultGenerated={(p, r) => handleAnalysisComplete(p, r)}
-                  initialParams={lastParams}
-                  initialResult={lastResult}
-                />
-              )}
-              {currentView === View.REPORT && lastResult && (
-                <TacticalReport
-                  params={lastParams}
-                  result={lastResult}
-                  user={currentUser}
-                  gpsCoords={coords}
-                />
-              )}
-              {currentView === View.CHECKLIST && <Checklist />}
-              {currentView === View.TRAINING && <TrainingChat />}
-              {currentView === View.MAP && <MapEditor />}
-              {currentView === View.OPERATORS && <OperatorLog user={currentUser} />}
-            </div>
-          </div>
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 min-h-screen relative overflow-x-hidden pt-4 md:pt-0">
+        <div className="p-4 md:p-8 lg:p-12 max-w-7xl mx-auto">
+          {currentView === View.HOME && <Home onNavigate={setCurrentView} onLogout={handleLogout} />}
+          {currentView === View.PLANNER && <Planner onAnalysisComplete={handleAnalysisComplete} />}
+          {currentView === View.MAP && <MapEditor />}
+          {currentView === View.REPORT && lastResult && <TacticalReport params={lastParams!} result={lastResult!} />}
+          {currentView === View.CHECKLIST && <Checklist />}
+          {currentView === View.TRAINING && <TrainingChat />}
+          {currentView === View.OPERATORS && <OperatorLog onNavigate={setCurrentView} />}
         </div>
       </main>
 
-      {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <div className="md:hidden fixed bottom-6 left-6 right-6 bg-slate-900/95 backdrop-blur-xl text-white py-4 px-6 rounded-2xl flex justify-between items-center shadow-2xl z-50 border border-white/10">
-        <button
-          onClick={() => setCurrentView(View.HOME)}
-          className={`flex flex-col items-center gap-1 transition ${currentView === View.HOME ? 'text-orange-500 scale-110' : 'text-slate-400 opacity-60'}`}
-        >
-          <LayoutDashboard className="w-6 h-6" />
-        </button>
-
-        <button
-          onClick={() => setCurrentView(View.PLANNER)}
-          className={`flex flex-col items-center gap-1 transition ${currentView === View.PLANNER ? 'text-orange-500 scale-110' : 'text-slate-400 opacity-60'}`}
-        >
-          <Flame className="w-6 h-6" />
-        </button>
-
-        {/* CENTER ACTION BUTTON */}
-        <div className="bg-orange-600 rounded-full p-3 -mt-10 shadow-lg shadow-orange-500/40 border-4 border-slate-100 flex items-center justify-center">
-          <button
-            onClick={() => setCurrentView(View.MAP)}
-            className={`transition ${currentView === View.MAP ? 'text-white' : 'text-white/90'}`}
-          >
-            <MapIcon className="w-6 h-6" />
-          </button>
-        </div>
-
-        <button
-          onClick={() => setCurrentView(View.REPORT)}
-          disabled={!lastResult}
-          className={`flex flex-col items-center gap-1 transition ${currentView === View.REPORT ? 'text-orange-500 scale-110' : !lastResult ? 'text-slate-600 cursor-not-allowed hidden' : 'text-slate-400 opacity-60'}`}
-        >
-          <FileText className="w-6 h-6" />
-        </button>
-
-        <button
-          onClick={() => setMobileMenuOpen(true)}
-          className="flex flex-col items-center gap-1 text-slate-400 opacity-60"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-      </div>
+      {/* MOBILE OVERLAY */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-30 md:hidden animate-in fade-in"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </div>
   );
 };
