@@ -18,7 +18,6 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     }, []);
 
     return (
-    return (
         <div className="fixed inset-0 h-dvh w-full overflow-hidden z-[100] bg-slate-950 flex flex-col items-center justify-center p-4">
 
             {/* Background Ambience */}
