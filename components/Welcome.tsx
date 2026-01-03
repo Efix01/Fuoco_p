@@ -18,7 +18,8 @@ const Welcome: React.FC<WelcomeProps> = ({ onEnter }) => {
     }, []);
 
     return (
-        <div className="fixed inset-0 h-dvh w-screen overflow-hidden z-[100] bg-slate-950 flex flex-col items-center justify-center p-4 animate-out fade-out duration-1000 fill-mode-forwards" style={{ animationPlayState: 'paused' }}>
+    return (
+        <div className="fixed inset-0 h-dvh w-full overflow-hidden z-[100] bg-slate-950 flex flex-col items-center justify-center p-4">
 
             {/* Background Ambience */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
