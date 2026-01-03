@@ -173,12 +173,19 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: 50, background: 'yellow', color: 'black', height: '100vh', fontSize: 24 }}>
-        <h1>STATO: CARICAMENTO IN CORSO...</h1>
-        <p>Se vedi questo messaggio per più di 5 secondi, c'è un problema con Supabase.</p>
-        <button onClick={() => setLoading(false)} style={{ padding: 20, background: 'black', color: 'white' }}>
-          FORZA AVVIO APP
-        </button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-slate-200">
+        <div className="w-20 h-20 mb-6 animate-pulse">
+          <CfvaLogo className="w-full h-full" />
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="text-xl font-bold tracking-tight text-white">CFVA</h1>
+          <p className="text-xs font-medium text-orange-500 uppercase tracking-widest">Fuoco Prescritto</p>
+        </div>
+        <div className="mt-8 flex gap-2">
+          <div className="w-2 h-2 rounded-full bg-orange-500 animate-bounce [animation-delay:-0.3s]"></div>
+          <div className="w-2 h-2 rounded-full bg-orange-500 animate-bounce [animation-delay:-0.15s]"></div>
+          <div className="w-2 h-2 rounded-full bg-orange-500 animate-bounce"></div>
+        </div>
       </div>
     );
   }
