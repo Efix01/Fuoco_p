@@ -173,7 +173,7 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-slate-200">
+      <div className="flex flex-col items-center justify-center h-dvh w-screen overflow-hidden bg-slate-900 text-slate-200">
         <div className="w-20 h-20 mb-6 animate-pulse">
           <CfvaLogo className="w-full h-full" />
         </div>
